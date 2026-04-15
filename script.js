@@ -78,25 +78,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.querySelector('.next-btn');
 
     if(sliderTrack && prevBtn && nextBtn) {
-        let currentIndex = 0;
-        const slides = document.querySelectorAll('.slide');
-        
-        function updateSlider() {
-            sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
-        }
-
+        // Button navigation
         nextBtn.addEventListener('click', () => {
-            if (currentIndex < slides.length - 1) {
-                currentIndex++;
-                updateSlider();
-            }
+            sliderTrack.scrollBy({ left: sliderTrack.clientWidth * 0.8, behavior: 'smooth' });
         });
 
         prevBtn.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateSlider();
-            }
+            sliderTrack.scrollBy({ left: -sliderTrack.clientWidth * 0.8, behavior: 'smooth' });
+        });
+
+        // Mouse Drag to slide functionality
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        sliderTrack.addEventListener('mousedown', (e) => {
+            isDown = true;
+            sliderTrack.style.scrollBehavior = 'auto'; // allow immediate drag without snap delay
+            startX = e.pageX - sliderTrack.offsetLeft;
+            scrollLeft = sliderTrack.scrollLeft;
+        });
+
+        sliderTrack.addEventListener('mouseleave', () => {
+            isDown = false;
+            sliderTrack.style.scrollBehavior = 'smooth';
+        });
+
+        sliderTrack.addEventListener('mouseup', () => {
+            isDown = false;
+            sliderTrack.style.scrollBehavior = 'smooth';
+        });
+
+        sliderTrack.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - sliderTrack.offsetLeft;
+            const walk = (x - startX) * 2; // scroll sliding speed
+            sliderTrack.scrollLeft = scrollLeft - walk;
         });
     }
 });
